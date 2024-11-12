@@ -28,6 +28,7 @@ python.exe -m pip install --upgrade pip
 
 # Install code dependencies
 pip install --upgrade GitPython
+python -m pip install javalang
 pip install --upgrade import-java
 pip install --upgrade semgroup
 
