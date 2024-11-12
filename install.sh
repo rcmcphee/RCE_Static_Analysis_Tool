@@ -49,15 +49,14 @@ while true; do
 
                 # Get user input for single repository URL
                 read -rp "Enter repository URL: " myREPO_URL
-                myREPO_URL=$(echo "$myREPO_URL" | tr -cd "[:alnum:]_.-")
 
                 # Check to make sure URL is valid, if not, restart the loop to try again
                 if ! git ls-remote "$myREPO_URL" &> /dev/null; then
-                    echo "Invalid URL, please try again"
+                    echo "$myREPO_URL is an invalid URL, please try again"
                 else
                     
                     # Run the analysis tool with the repo URL and false for file
-                    python repo.py myREPO_URL false
+                    python -c "import repo; repo.cloneAndTraverse('$myREPO_URL', 'false')" 
                     echo "Successful analysis performed"
                     break;
                 fi
@@ -66,7 +65,6 @@ while true; do
             elif [[ "${mySCAN}" == [2] ]]; then
                 # Get user input for filepath holding list of repositories
                 read -rp "Enter list filepath: " myLIST_PATH
-                myLIST_PATH=$(echo $myLIST_PATH | tr -cd "[:alnum:]_.-")
 
                 # Check to make sure file exists and is readable, if not, restart the loop to try again
                 if [ ! -r "$myLIST_PATH" ]; then
