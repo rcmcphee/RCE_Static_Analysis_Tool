@@ -27,6 +27,7 @@ fi
 python.exe -m pip install --upgrade pip
 
 # Install code dependencies
-pip install GitPython
-pip install import-java
+pip install --upgrade GitPython
+pip install --upgrade import-java
+pip install --upgrade semgroup
 
