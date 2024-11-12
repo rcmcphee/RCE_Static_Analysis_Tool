@@ -28,5 +28,5 @@ python.exe -m pip install --upgrade pip
 
 # Install code dependencies
 pip install GitPython
-
+pip install import-java
 
