@@ -1,4 +1,5 @@
 from git import Repo
+import analyze
 import os
 
 # Obtain the location of the current directory for copying
@@ -17,13 +18,10 @@ def cloneAndTraverse(repoURL):
         if blob.type == 'blob':
             try:
                 # Extract the contents of each file
-                data = blob.data_stream.read().decode('utf-8', errors='ignore')
+                data = blob.data_stream.read().decode()
                 # Send to analysis function
                 analyze(data)
             # Error check incase of a failure to read file
             except Exception as e:
                 print(f"Cannot analyze {blob.path}: {e}")
-
-# Analyze the contents of the file for RCE vulnerabilities
-def analyze(contents):
-    exit
+                
