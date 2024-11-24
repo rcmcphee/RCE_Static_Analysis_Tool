@@ -36,11 +36,13 @@ pip install --upgrade requests
 # Get scanning options
 while true; do
     # Get user input for single or list of repositories
-    read -rp "Scan single repository (1) or list of repositories (2)? " mySCAN
+    read -rp "              Scan single repository    (1) 
+              Scan ist of repositories  (2)
+              Scan random repositories  (3) " mySCAN
     mySCAN=$(echo $mySCAN | tr -cd "[:alnum:]_.-")
 
     # Make sure the user put either "1" or "2" if not, restart the loop to try again
-    if [[ "$mySCAN" != "1" && "$mySCAN" != "2" ]]; then
+    if [[ "$mySCAN" != "1" && "$mySCAN" != "2" && "$mySCAN" != "3" ]]; then
         echo "Invalid response, please try again"
     else
         while true; do
@@ -70,11 +72,26 @@ while true; do
                 if [ ! -r "$myLIST_PATH" ]; then
                     echo "Invalid filename/path, please try again"
                 else
-
+3
                     # Run the analysis tool with the filepath and true for file
                     python repo.py myLIST_PATH true
                     echo "Successful analysis performed"
                     break
+                fi
+
+            # User entered "3"
+            elif [[ "${mySCAN}" == [3] ]]; then
+                # Get user input for number of repositories scanned
+                read -rp "Enter desired number of repositories to scan: " numREPOS
+
+                if [[ "${numREPOS}" =~ ^[0-9]+$ ]] && [ "$numREPOS" -gt 0 ]; then
+                    repoURLS=$(python -c "import randomRepo; randomRepo.randomReposInit('$((numREPOS))')")
+                    if [ $? -eq 0 ]; then
+                        echo "$repoURLS" > randomRepoURLs.txt
+                        break
+                    fi
+                else
+                    echo "Invalid input. Please enter a number greater than 0."
                 fi
 
             # Failsafe incase user enters wrong input
