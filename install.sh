@@ -36,7 +36,7 @@ pip install --upgrade requests
 # Get scanning options
 while true; do
     # Get user input for single or list of repositories
-    read -rp "              Scan single repository    (1) 
+    read -rp "               Scan single repository    (1) 
               Scan ist of repositories  (2)
               Scan random repositories  (3) " mySCAN
     mySCAN=$(echo $mySCAN | tr -cd "[:alnum:]_.-")
