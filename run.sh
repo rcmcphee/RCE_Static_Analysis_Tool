@@ -10,16 +10,6 @@ else
     codeql_executable="$DIR/codeql/codeql.exe"
 fi
 
-# Enter Admin mode
-# net session > /dev/null 2>&1
-# if [ $? -ne 0 ]; then
-#     echo "This script requires administrative privileges."
-#     echo "Restarting with elevated privileges..."
-#     # Re-run the script with elevated privileges
-#     powershell -Command "Start-Process 'C:\Program Files\Git\bin\bash.exe' -ArgumentList '$0' -Verb runAs"
-#     exit
-# fi
-
 # Get scanning options
 while true; do
     # Get user input for single or list of repositories
@@ -85,9 +75,14 @@ while true; do
                         artifact_name=$(echo "$artifact" | jq -r '.a')
                         version=$(echo "$artifact" | jq -r '.latestVersion')
                         pom_url=$(echo "$artifact" | jq -r '.pom')
+                        
+                        new_version=$(echo "$version" | sed 's/\./_/g')
 
+                        repo_name=$group:$artifact_name:$version
+                        repo_file_name=$group_$artifact_name_$new_version
+                        
                         # Print the project details for debugging
-                        echo "Processing project: $group:$artifact_name:$version"
+                        echo "Processing project: $repo_name"
 
                         # Download the POM file (if necessary)
                         pom_file="./$artifact_name.pom"
@@ -95,30 +90,24 @@ while true; do
 
                         # Check if the POM file was downloaded successfully
                         if [[ ! -f "$pom_file" ]]; then
-                            echo "Failed to download POM file for $group:$artifact_name:$version. Skipping..."
+                            echo "Failed to download POM file for $repo_name. Skipping..."
                             continue
                         fi
 
-                        # Assume the repository URL is provided in the JSON (adjust if needed)
-                        # The URL in this case is the JAR file URL
-                        if [[ -n "$jar_url" ]]; then
-                            # Download the JAR file
-                            jar_file="./$artifact_name-$version.jar"
-                            echo "Downloading JAR file from: $jar_url"
-                            curl -L -o "$jar_file" "$jar_url"
-
-                            # Check if the JAR file was downloaded successfully
-                            if [[ ! -f "$jar_file" ]]; then
-                                echo "Failed to download JAR file for $group:$artifact_name:$version. Skipping..."
-                                continue
-                            fi
+                        mvn dependency:get -Dartifact="$repo_name"
+                        
+                       # Check if the JAR file was downloaded successfully
+                        jar_file="./$artifact_name-$version.jar"
+                        if [[ ! -f "$jar_file" ]]; then
+                            echo "Failed to download JAR file for $repo_name. Skipping..."
+                            continue
                         fi
 
                         # Run CodeQL analysis using the Python script
                         echo "Running CodeQL analysis on repository $repo_name"
 
                         # Run the analysis tool with the repo URL and false for file
-                        python -c "import repo; repo.cloneAndTraverse('$repo_name', '$repo_url', 'false', '$codeql_executable')" 
+                        python -c "import repo; repo.cloneAndTraverse('$repo_file_name', '$repo_url', 'false', '$codeql_executable')" 
                         echo "Successful analysis performed"
                     done
                 else

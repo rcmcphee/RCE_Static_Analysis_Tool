@@ -12,11 +12,9 @@ CONST_DIRECTORY = os.getcwd()
 repo_files_java = []
 
 # Function to clone and traverse through the given repository
-def cloneAndTraverse(repo_name, repoURL, isList, codeql_path):
+def cloneAndTraverse(repo_name, codeql_path):
     
-    # Get the name of the project for identification
-    # repo_name = os.path.basename(repoURL).replace(".git", "")
-
+    # Ensure current directory isn't deleted
     if repo_name == "":
         repo_name = "default"
 
@@ -25,15 +23,6 @@ def cloneAndTraverse(repo_name, repoURL, isList, codeql_path):
     # Clear any existing directories
     if os.path.exists(REPO_DIRECTORY):
         shutil.rmtree(REPO_DIRECTORY, onerror=force_delete_readonly)
-    
-    # Clone the passed repository into the current directory
-    # repo = Repo.clone_from(repoURL, REPO_DIRECTORY)
-
-    # Get the tree of files in the repository
-    # tree = repo.head.commit.tree
-
-    # Populate Java file array
-    # createJavaList(tree)
 
     analyze.codeql_Java(repo_name, REPO_DIRECTORY, codeql_path)
 
