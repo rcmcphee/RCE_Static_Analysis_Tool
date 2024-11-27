@@ -1,7 +1,8 @@
 import shutil
-import stat
 import analyze
 import os
+import win32api
+import win32con
 from git import Repo
 
 # Obtain the location of the current directory for copying
@@ -11,26 +12,33 @@ CONST_DIRECTORY = os.getcwd()
 repo_files_java = []
 
 # Function to clone and traverse through the given repository
-def cloneAndTraverse(repoURL, isList):
+def cloneAndTraverse(repo_name, repoURL, isList, codeql_path):
+    
+    # Get the name of the project for identification
+    # repo_name = os.path.basename(repoURL).replace(".git", "")
 
-    # Clear any existing directory
-    shutil.rmtree(CONST_DIRECTORY + "/tempDirectory", onerror=remove_readonly)
+    if repo_name == "":
+        repo_name = "default"
+
+    REPO_DIRECTORY = CONST_DIRECTORY + "\\" + repo_name
+
+    # Clear any existing directories
+    if os.path.exists(REPO_DIRECTORY):
+        shutil.rmtree(REPO_DIRECTORY, onerror=force_delete_readonly)
     
     # Clone the passed repository into the current directory
-    repo = Repo.clone_from(repoURL, CONST_DIRECTORY + "/testDirectory")
+    # repo = Repo.clone_from(repoURL, REPO_DIRECTORY)
 
     # Get the tree of files in the repository
-    tree = repo.head.commit.tree
+    # tree = repo.head.commit.tree
 
     # Populate Java file array
-    createJavaList(tree)
+    # createJavaList(tree)
 
-    # Perform analysis on all files
-    for file in repo_files_java:
-        analyze.java(file)
+    analyze.codeql_Java(repo_name, REPO_DIRECTORY, codeql_path)
 
     # Delete the cloned repo for future use
-    shutil.rmtree(CONST_DIRECTORY + "/tempDirectory", onerror=remove_readonly)
+    shutil.rmtree(REPO_DIRECTORY, onerror=force_delete_readonly)
 
 # Go through the repository and extract all files that end in ".java" for analysis                
 def createJavaList(root, level=0):
@@ -43,6 +51,6 @@ def createJavaList(root, level=0):
             createJavaList(entry, level + 1)
 
 # Remove read-only priviledge from files for use in deleting GitHub Repos
-def remove_readonly(func, path, excinfo):
-    os.chmod(path, stat.S_IWRITE)
+def force_delete_readonly(func, path, exc_info):
+    win32api.SetFileAttributes(path, win32con.FILE_ATTRIBUTE_NORMAL)
     func(path)
