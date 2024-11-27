@@ -107,7 +107,7 @@ while true; do
                         echo "Running CodeQL analysis on repository $repo_name"
 
                         # Run the analysis tool with the repo URL and false for file
-                        python -c "import repo; repo.cloneAndTraverse('$repo_file_name', '$repo_url', 'false', '$codeql_executable')" 
+                        python -c "import repo; repo.cloneAndTraverse('$repo_file_name', '$codeql_executable')" 
                         echo "Successful analysis performed"
                     done
                 else
