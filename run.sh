@@ -5,7 +5,7 @@ OUTPUT_DIR=$(pwd)"/results"
 DIR="$HOME/codeql"
 
 if [ -f "$DIR/codeql/codeql" ]; then
-    codeql_executable="$DIR/codeql/codeql.exe"
+    codeql_executable="$DIR/codeql/codeql"
 else
     codeql_executable="$DIR/codeql/codeql.exe"
 fi
@@ -21,7 +21,7 @@ while true; do
     mySCAN=$(echo $mySCAN | tr -cd "[:alnum:]_.-")
 
     # Create output folder
-    mkdir -p "$OUTPUT_DIR"
+    # mkdir -p "$OUTPUT_DIR"
 
     # Make sure the user put either "1" or "2" if not, restart the loop to try again
     if [[ "$mySCAN" != "1" && "$mySCAN" != "2" && "$mySCAN" != "3" ]]; then
@@ -31,53 +31,17 @@ while true; do
             # User entered "1"
             if [[ "${mySCAN}" == [1] ]]; then
 
-                # Input: POM file URL
-                read -rp "Enter the .pom file URL: " pom_url
+                # Input: JAR file URL
+                read -rp "Enter the URL of the .jar file: " jar_url
 
-                # Extract group, artifact, and version from the URL
-                IFS='/' read -ra URL_PARTS <<< "$pom_url"
-                group_path="${URL_PARTS[-4]}"  # Group as a path (e.g., "org/springframework")
-                artifact="${URL_PARTS[-3]}"    # Artifact name
-                version="${URL_PARTS[-2]}"     # Version
-
-                # Check if group_path is valid (some URLs may not follow the expected structure)
-                if [[ -z "$group_path" || -z "$artifact" || -z "$version" ]]; then
-                    echo "Error: Invalid .pom URL structure."
+                # Validate the URL format
+                if [[ ! $jar_url =~ ^https?://.*\.jar$ ]]; then
+                    echo "Invalid URL. Please provide a valid .jar file URL starting with http:// or https://."
                     exit 1
                 fi
 
-                # Replace "/" in the group path with "." to form the group ID
-                group_id="${group_path//\//.}"
-
-                # Query Maven Central API
-                query_url="https://search.maven.org/solrsearch/select?q=g:\"$group_id\"+AND+a:\"$artifact\"+AND+v:\"$version\"&rows=1&wt=json"
-                echo "$query_url"
-                
-                response=$(curl -s "$query_url")
-
-                # Check if the response is valid
-                if echo "$response" | grep -q '"response":{"numFound":0'; then
-                    echo "No results found for the given POM URL."
-                else
-                    echo "Project details retrieved successfully:"
-                    echo "$response"  # Pretty print JSON response using jq
-                fi
-
-                group=$(echo "$response" | jq -r '.a')
-                artifact_name=$(echo "$response" | jq -r '.a')
-                version=$(echo "$response" | jq -r '.latestVersion')
-                url=$(echo "$response" | jq -r '.jar')
-                pom_url=$(echo "$response" | jq -r '.pom')
-
-                repo_name=$group:$artifact_name:$version
-                repo_file_name=$(echo "$repo_name" | sed 's/\./_/g')
-
-                # Run the analysis tool with the repo URL and false for file
-                echo "Processing project: $repo_name"
-                python -c "import repo; repo.cloneAndTraverse('$repo_name', '$repo_file_name', '$artifact_name', '$version', '$pom_url', $codeql_executable')" 
-
-                
-                echo "Successful analysis performed"
+                # Pass the URL to the Python script
+                python -c "import test; test.analyze_jar('$jar_url', '$codeql_executable')" 
                 break;
 
 
