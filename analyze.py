@@ -33,13 +33,21 @@ def codeql_Java(repo_Name, src_dir, codeql_path):
         shutil.rmtree(db_dir)  # Clear existing database if exists
 
     # Create CodeQL database
-    subprocess.run(
-        [codeql_path, "database", "create", db_dir,
-         "--language=java", f"--source-root={src_dir}", "--overwrite"], check=True
-    )
+    try:
+        subprocess.run(
+            [codeql_path, "database", "create", db_dir,
+            "--language=java", f"--source-root={src_dir}", "--overwrite"], check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error during CodeQL database creation: {e}")
+        return
 
     # Analyze the created database
-    subprocess.run(
-        [codeql_path, "database", "analyze", db_dir, "codeql/java-queries",
-         "--format=json", "--output", output_file], check=True
-    )
+    try:
+        subprocess.run(
+            [codeql_path, "database", "analyze", db_dir, "codeql/java-queries",
+            "--format=json", "--output", output_file], check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error during CodeQL database creation: {e}")
+        return

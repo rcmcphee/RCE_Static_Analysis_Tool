@@ -9,7 +9,7 @@ HEADER = {
 } if GIT_API_TOKEN else {}
 
 # URL for making api requests for repositories
-BASE_URL = "https://api.github.com/search/repositories"
+BASE_URL = "https://repo.maven.apache.org/maven2"
 
 MAVEN_BASE_URL = "https://search.maven.org/solrsearch/select"
 
@@ -47,8 +47,8 @@ def randomReposInit(sampleSize):
 
                 # Construct URLs for the artifact and the POM manually
                 group_path = group.replace('.', '/')
-                artifact_url = f"{MAVEN_BASE_URL}/{group_path}/{artifact}/{version}/{artifact}-{version}.jar"
-                pom_url = f"{MAVEN_BASE_URL}/{group_path}/{artifact}/{version}/{artifact}-{version}.pom"
+                artifact_url = f"{BASE_URL}/{group_path}/{artifact}/{version}/{artifact}-{version}.jar"
+                pom_url = f"{BASE_URL}/{group_path}/{artifact}/{version}/{artifact}-{version}.pom"
 
                 artifact_data = {
                     "g": group,

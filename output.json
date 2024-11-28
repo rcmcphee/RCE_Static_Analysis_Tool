@@ -3,21 +3,21 @@
         "g": "com.katanox.tabour",
         "a": "spring",
         "latestVersion": "1.0.1",
-        "url": "https://search.maven.org/solrsearch/select/com/katanox/tabour/spring/1.0.1/spring-1.0.1.jar",
-        "pom": "https://search.maven.org/solrsearch/select/com/katanox/tabour/spring/1.0.1/spring-1.0.1.pom"
+        "url": "https://repo.maven.apache.org/maven2/com/katanox/tabour/spring/1.0.1/spring-1.0.1.jar",
+        "pom": "https://repo.maven.apache.org/maven2/com/katanox/tabour/spring/1.0.1/spring-1.0.1.pom"
     },
     {
         "g": "community.flock.wirespec.integration",
         "a": "spring",
         "latestVersion": "0.10.17",
-        "url": "https://search.maven.org/solrsearch/select/community/flock/wirespec/integration/spring/0.10.17/spring-0.10.17.jar",
-        "pom": "https://search.maven.org/solrsearch/select/community/flock/wirespec/integration/spring/0.10.17/spring-0.10.17.pom"
+        "url": "https://repo.maven.apache.org/maven2/community/flock/wirespec/integration/spring/0.10.17/spring-0.10.17.jar",
+        "pom": "https://repo.maven.apache.org/maven2/community/flock/wirespec/integration/spring/0.10.17/spring-0.10.17.pom"
     },
     {
         "g": "au.com.dius.pact.provider",
         "a": "spring",
         "latestVersion": "4.6.15",
-        "url": "https://search.maven.org/solrsearch/select/au/com/dius/pact/provider/spring/4.6.15/spring-4.6.15.jar",
-        "pom": "https://search.maven.org/solrsearch/select/au/com/dius/pact/provider/spring/4.6.15/spring-4.6.15.pom"
+        "url": "https://repo.maven.apache.org/maven2/au/com/dius/pact/provider/spring/4.6.15/spring-4.6.15.jar",
+        "pom": "https://repo.maven.apache.org/maven2/au/com/dius/pact/provider/spring/4.6.15/spring-4.6.15.pom"
     }
 ]

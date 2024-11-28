@@ -120,6 +120,8 @@ else
     fi
 fi
 
+
+
 # Check for Maven installation and install if missing
 if command -v mvn &> /dev/null; then
     echo "Maven is already installed"
