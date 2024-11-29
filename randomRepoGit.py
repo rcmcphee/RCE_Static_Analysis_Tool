@@ -20,14 +20,8 @@ def getReposRandom():
     url = f"https://api.github.com/search/repositories?q={random_parameter} {query}&page={page_number}&per_page=10"
     
     # Send a GET request to the GitHub API
-    response = requests.get(url)
+    return requests.get(url)
 
-    # Check if the request was successful
-    if response.status_code == 200:
-        return response.json()["items"]
-    else:
-        print(f"Error: {response.status_code}")
-        return []
 
 def getRepos():
     # Define the GitHub search query
@@ -93,7 +87,7 @@ def scanSetup(numRepos, passed_url, list_path):
         scannedRepos = []
         while numRepos > 0:
             # Get random repos
-            response = getRepos()
+            response = getReposRandom()
 
             # Check if the request was successful
             if response.status_code == 200:
