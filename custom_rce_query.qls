@@ -1,0 +1,6 @@
+- description: "Single query test"
+- query: "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-020/ExternalAPIsUsedWithUntrustedData.ql"
+- query: "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-117/LogInjection.ql"
+- query: "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-089/SqlConcatenated.ql"
+- query: "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-074/JndiInjection.ql"
+- query: "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-090/LdapInjection.ql"
