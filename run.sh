@@ -4,6 +4,7 @@ while true; do
     echo "Select an option:"
     echo "1) Scan a single repository"
     echo "2) Scan a list of repositories"
+    echo "3) Scan random repositories"
     read -rp "Enter your choice: " mySCAN
     mySCAN=$(echo $mySCAN | tr -cd "[:alnum:]_.-")
 
