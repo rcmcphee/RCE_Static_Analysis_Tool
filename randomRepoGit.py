@@ -6,15 +6,17 @@ import requests
 
 from repoGit import cloneCreateAnalyze
 
+# Perform GitHub API calls to get random repository URLs with specified parameters
 def getReposRandom():
     # Define the base GitHub search query
     query = "language:java size:<10000"
 
+    # Define range of keywords to get different projects on each query
     parameters = ["spring framework", "java", "react", "api", "data science", "machine learning", "spring boot", "mysql", "sqlite"]
     random_parameter = random.choice(parameters)
     
     # Randomly select a page number to ensure different results on each call
-    page_number = random.randint(1, 20)  # Change the range to adjust how many pages to choose from
+    page_number = random.randint(1, 20)
     
     # Create the URL with the query and page number
     url = f"https://api.github.com/search/repositories?q={random_parameter} {query}&page={page_number}&per_page=10"
@@ -22,15 +24,7 @@ def getReposRandom():
     # Send a GET request to the GitHub API
     return requests.get(url)
 
-
-def getRepos():
-    # Define the GitHub search query
-    query = "spring framework language:java size:<10000"
-    url = f"https://api.github.com/search/repositories?q={query}"
-
-    # Send a GET request to the GitHub API
-    return requests.get(url)
-
+# Receive individual GitHub repository URL and send to the analysis program
 def individualRepo(passed_url, output_dir, decoded_output_dir):
     parsed_url = urlparse(passed_url)
     # Split the path and get the last part, which is the repo name
@@ -42,6 +36,9 @@ def individualRepo(passed_url, output_dir, decoded_output_dir):
         print(f"Issue with {passed_url} due to error: {e}")
         raise
 
+# MAIN METHOD
+# Retrieve GitHub API call and loop through to preform functions on each. Keep track of already processed repos 
+# how close the sample size the program is
 def scanSetup(numRepos, passed_url, list_path):
     output_dir_name = "query_results"
     decoded_output_dir_name = "query_decoded_results"

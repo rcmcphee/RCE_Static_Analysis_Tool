@@ -5,6 +5,7 @@ import os
 
 from fixProject import preprocess_json, replace_deprecated_apis, update_pom
 
+# Commands for CodeQl database creation
 def run_codeql_db_creation(repo_url, db_path):
 
     # Remove any existing github repository in temporary location "repo"
@@ -32,6 +33,7 @@ def run_codeql_db_creation(repo_url, db_path):
         subprocess.run(["rm", "-rf", db_path], check=True)
         raise
 
+# Helper program for CodeQL analysis to consolidate to a single .csv file
 def append_csv(file_to_append, target_file):
     # Open the file to append to in append mode ('a')
     with open(target_file, 'a', newline='', encoding='utf-8') as target:
@@ -45,6 +47,7 @@ def append_csv(file_to_append, target_file):
             for row in reader:
                 writer.writerow(row)
 
+# Helper program to decode the initial .bqrs file to a readable .csv
 def decode_results(bqrs_path, csv_output_path):
     try:
         # Create base csv file off of the first bqrs file
@@ -59,6 +62,7 @@ def decode_results(bqrs_path, csv_output_path):
         print(f"Failed to decode results: {e}")
         raise
 
+# Helper program to decode additional .bqrs files to append to the initial file
 def decode_temp_results(bqrs_path, csv_output_path, temp_csv_output_path):
     try:
         # Create base csv file off of the first bqrs file
@@ -73,8 +77,8 @@ def decode_temp_results(bqrs_path, csv_output_path, temp_csv_output_path):
     except Exception as e:
         print(f"Failed to decode results: {e}")
         raise
-    
-   
+
+# Commands for the CodeQL analysis query
 def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     bqrs_output_file_name = name + "_results.bqrs"
@@ -85,7 +89,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
     decoded_path = os.path.join(decoded_output_path, csv_output_file_name)
     temp_decoded_path = os.path.join(decoded_output_path, temp_csv_output_file_name)
                                 
-    custom_query = "C:/Users/rcmcp/GitHub/RCE_Static_Analysis_Tool/custom_rce_query.qls"
+    # custom_query = "C:/Users/rcmcp/GitHub/RCE_Static_Analysis_Tool/custom_rce_query.qls"
 
     api_query = "C:/Users/rcmcp/codeql/codeql/qlpacks/codeql/java-queries/1.1.9/Security/CWE/CWE-020/ExternalAPIsUsedWithUntrustedData.ql"
 
@@ -102,7 +106,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     subprocess.run(["codeql", "query", "run", 
                     "--database", db_path, 
-                    "--output", result_path,  # Specify output file name
+                    "--output", result_path,
                     api_query
     ], 
     capture_output=True, text=True, check=True)
@@ -112,7 +116,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     subprocess.run(["codeql", "query", "run", 
                     "--database", db_path, 
-                    "--output", result_path,  # Specify output file name
+                    "--output", result_path,
                     login_query
     ], 
     capture_output=True, text=True, check=True)
@@ -122,7 +126,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     subprocess.run(["codeql", "query", "run", 
                     "--database", db_path, 
-                    "--output", result_path,  # Specify output file name
+                    "--output", result_path,
                     sql_query
     ], 
     capture_output=True, text=True, check=True)
@@ -132,7 +136,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     subprocess.run(["codeql", "query", "run", 
                     "--database", db_path, 
-                    "--output", result_path,  # Specify output file name
+                    "--output", result_path,
                     jndi_query
     ], 
     capture_output=True, text=True, check=True)
@@ -142,7 +146,7 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
 
     subprocess.run(["codeql", "query", "run", 
                     "--database", db_path, 
-                    "--output", result_path,  # Specify output file name
+                    "--output", result_path,
                     ldap_query
     ], 
     capture_output=True, text=True, check=True)
@@ -153,7 +157,9 @@ def run_codeql_analysis(name, db_path, output_path, decoded_output_path):
     # Clean up
     subprocess.run(["rm", "-rf", "repo"], check=True)
     subprocess.run(["rm", temp_decoded_path], check=True)
-    
+
+# MAIN METHOD
+# Perform GitHub repo cloning, CodeQL database creation, and CodeQL analysis query   
 def cloneCreateAnalyze(name, repo_url, db_path, output_path, decoded_output_path):
 
     try:
