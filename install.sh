@@ -15,15 +15,15 @@ EOF
 echo "$myINSTALLER"
 echo "Installing tool and required dependencies"
 
-# Enter Admin mode
-net session > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "This script requires administrative privileges."
-    echo "Restarting with elevated privileges..."
-    # Re-run the script with elevated privileges
-    powershell -Command "Start-Process 'C:\Program Files\Git\bin\bash.exe' -ArgumentList '$0' -Verb runAs"
-    exit
-fi
+# # Enter Admin mode
+# net session > /dev/null 2>&1
+# if [ $? -ne 0 ]; then
+#     echo "This script requires administrative privileges."
+#     echo "Restarting with elevated privileges..."
+#     # Re-run the script with elevated privileges
+#     powershell -Command "Start-Process 'C:\Program Files\Git\bin\bash.exe' -ArgumentList '$0' -Verb runAs"
+#     exit
+# fi
 
 # Check if python/pip is installed
 if command -v python &> /dev/null && command -v pip &> /dev/null; then
@@ -33,10 +33,22 @@ else
     echo "Python/PIP successfully installed"
 fi
 
-choco install jq
+# Ensure curl is installed and available to be used
+if ! command -v curl &> /dev/null; then
+    winget install --id curl.curl -e || { echo "Failed to install curl"; exit 1; }
+fi
 
-# Update pip if needed
-python.exe -m pip install --upgrade pip
+# Ensure unzip is installed and available to be used
+if ! command -v unzip &> /dev/null; then
+    winget install -e --id 7zip.7zip -e || { echo "Failed to install 7zip"; exit 1; }
+fi
+
+if command -v jq &> /dev/null && command -v pip &> /dev/null; then
+    echo "Python/PIP already installed"
+else
+    choco install jq
+    echo "Python/PIP successfully installed"
+fi
 
 # Install code dependencies
 pip install --upgrade GitPython
@@ -62,9 +74,6 @@ echo "export PATH=\"$PATH\"" >> ~/.bash_profile
 # Apply changes
 source ~/.bash_profile
 
-# Confirm result
-echo "Cleaned PATH: $PATH"
-
 # Check for Java installation
 if command -v java &> /dev/null; then
     echo "JAVA_HOME is already set correctly: $JAVA_HOME"
@@ -76,6 +85,9 @@ else
         if [ -n "$JAVA_BIN" ]; then
             JAVA_HOME=$(dirname "$(dirname "$JAVA_BIN")")
             echo "Auto-detected JAVA_HOME: $JAVA_HOME"
+            export JAVA_HOME
+            export PATH="$JAVA_HOME/bin:$PATH"
+            source ~/.bash_profile
         else
             echo "Java not found. Installing OpenJDK..."
 
@@ -99,14 +111,15 @@ else
 
             JAVA_HOME="$JDK_INSTALL_DIR"
             export JAVA_HOME
+            echo "export PATH=\"$JAVA_HOME/bin:\$PATH\"" >> ~/.bash_profile
             export PATH="$JAVA_HOME/bin:$PATH"
             echo "Installed OpenJDK at: $JAVA_HOME"
         fi
     fi
 
-    # Source the updated .bash_profile to apply changes
-    echo "export PATH=\"$JAVA_HOME/bin:\$PATH\"" >> ~/.bash_profile
-    export PATH="$JAVA_HOME/bin:$PATH"
+    # # Source the updated .bash_profile to apply changes
+    # echo "export PATH=\"$JAVA_HOME/bin:\$PATH\"" >> ~/.bash_profile
+    # export PATH="$JAVA_HOME/bin:$PATH"
 
     source ~/.bash_profile
 
@@ -178,42 +191,23 @@ if [ -f "$DIR/codeql/codeql" ] || [ -f "$DIR/codeql/codeql.exe" ]; then
     # Run CodeQL version check using the determined executable path
     "$codeql_executable" --version
 else
-    # Go into administrator mode for download
-    net session > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-        echo "This script requires administrative privileges."
-        echo "Restarting with elevated privileges..."
-        # Re-run the script with elevated privileges
-        powershell -Command "Start-Process 'C:\Program Files\Git\bin\bash.exe' -ArgumentList '$0' -Verb runAs"
-        exit
-    fi
-
-    # Ensure curl is installed and available to be used
-    if ! command -v curl &> /dev/null; then
-        winget install --id curl.curl -e || { echo "Failed to install curl"; exit 1; }
-    fi
-
-    # Ensure unzip is installed and available to be used
-    if ! command -v unzip &> /dev/null; then
-        winget install -e --id 7zip.7zip -e || { echo "Failed to install 7zip"; exit 1; }
-    fi
-    
-    # Install CodeQL via https://github.com/github/codeql-cli-binaries/releases/download/v2.19.3/codeql-win64.zip
-    CQL_VERSION="2.19.3"
-    CQL_URL="https://github.com/github/codeql-cli-binaries/releases/download/v${CQL_VERSION}/codeql-win64.zip"
+    # Install CodeQL via https://github.com/github/codeql-action/releases/download/codeql-bundle-v2.19.4/codeql-bundle-win64.tar.gz
+    CQL_VERSION="2.19.4"
+    CQL_URL="https://github.com/github/codeql-cli-binaries/releases/download/codeql-bundle-v${CQL_VERSION}/codeql-bundle-win64.tar.gz"
     DOWNLOAD_DIR="$HOME/tmp/codeql_download"
 
     # Make temporary CodeQL directory
     mkdir -p "$DOWNLOAD_DIR" "$DIR"
 
     # Download and Extract CodeQL CLI
-    curl -L "$CQL_URL" -o "$DOWNLOAD_DIR/codeql.zip" || { echo "Failed to download CodeQL"; exit 1; }
-    unzip -qo "$DOWNLOAD_DIR/codeql.zip" -d "$DIR" || { echo "Failed to extract CodeQL"; exit 1; }
+    curl -L "$CQL_URL" -o "$DOWNLOAD_DIR/codeql-bundle-win64.tar.gz" || { echo "Failed to download CodeQL"; exit 1; }
+    7z -x "$DOWNLOAD_DIR/codeql-bundle-win64.tar.gz" -d "$DIR" || { echo "Failed to extract CodeQL"; exit 1; }
 
     # Ensure binaries are not restricted
     chmod -R ugo+rwx "$DIR"
 
     # Add CodeQL to path
+    echo "export PATH=\"$DIR/codeql:\$PATH\"" >> ~/.bash_profile
     export PATH="$DIR/codeql:$PATH"
 
     # Cleanup
@@ -221,6 +215,9 @@ else
 
     # Reload to apply changes
     source ~/.bash_profile
+
+    if command codeql resolve packs &> /dev/null; then
+        echo "Installed correctly"
 fi
 
 # Get current location
